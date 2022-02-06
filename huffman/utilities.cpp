@@ -15,7 +15,7 @@ void MinHeap::insert( Node* newNode )
     // fix minHeap
     int cIdx = size - 1;
     int pIdx = ( cIdx + 1 ) / 2 - 1;
-    while ( minHeap[pIdx]->freq > minHeap[cIdx]->freq ){
+    while ( pIdx >= 0 && minHeap[pIdx]->freq > minHeap[cIdx]->freq ){
         swap( pIdx, cIdx );
         cIdx = pIdx;
         pIdx = ( cIdx + 1 ) / 2 - 1;
@@ -23,6 +23,11 @@ void MinHeap::insert( Node* newNode )
 }
 Node* MinHeap::getMin()
 {
+    if ( size == 0 ){
+        cout << "heap underflow\n";
+        exit(-1);
+    }
+    
     Node* rst = minHeap[0];
     minHeap[0] = minHeap[size-1];
     size--;

@@ -15,3 +15,6 @@
 
 # Ignore zip
 *.tar.gz
+
+# Ignore test file
+test*

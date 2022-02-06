@@ -16,4 +16,5 @@ public:
     MinHeap() { minHeap = new Node*[512]; capacity = 512; size = 0; }
     void insert( Node* newNode );
     Node* getMin();
+    int getSize(){ return size; }
 };
