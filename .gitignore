@@ -1,0 +1,17 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+# Uignore makefile
+!Makefile
+
+# Ignore object file
+*.o
+
+# Ignore zip
+*.tar.gz
