@@ -4,7 +4,7 @@ using namespace std;
 
 void MinHeap::insert( Node* newNode )
 {
-    if ( capacity <= size ){
+    if ( capacity == size ){
         cout << "heap overflow\n";
         exit(-1);
     }
@@ -27,12 +27,25 @@ Node* MinHeap::getMin()
         cout << "heap underflow\n";
         exit(-1);
     }
-    
+    if ( size == 1 ){
+        size--;
+        return minHeap[0];
+    }
+
     Node* rst = minHeap[0];
     minHeap[0] = minHeap[size-1];
     size--;
+
     minHeapify( 0 );
     
+    {//Deubg
+        if ( rst->endFlag == true )
+            cout << "end";
+        else 
+            cout << rst->symbol;
+        cout << rst->freq << endl;
+    }
+
     return rst;
 }
 void MinHeap::minHeapify( int currIdx )
@@ -43,15 +56,14 @@ void MinHeap::minHeapify( int currIdx )
 
     if ( lIdx < size && minHeap[currIdx]->freq > minHeap[lIdx]->freq )
         sIdx = lIdx;
-    if ( rIdx < size && minHeap[currIdx]->freq > minHeap[rIdx]->freq && minHeap[sIdx] > minHeap[rIdx] )
+    if ( rIdx < size && minHeap[sIdx]->freq > minHeap[rIdx]->freq )
         sIdx = rIdx;
     
-    // nothing to change
-    if ( sIdx == currIdx )
-        return;
-    // Heapify
-    swap ( currIdx, sIdx );
-    minHeapify( sIdx );
+
+    if ( sIdx != currIdx ){
+        swap ( currIdx, sIdx );
+        minHeapify( sIdx );
+    }
 }
 void MinHeap::swap( int a, int b )
 {
