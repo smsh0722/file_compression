@@ -37,7 +37,7 @@ void getFrequency( FILE* rfp, int freqArr[] )
 {
     char c = fgetc( rfp );;
     while ( c != EOF ){
-        freqArr[(int)c]++;
+        freqArr[(unsigned int)c]++;
         c = fgetc( rfp );
     }
 }
