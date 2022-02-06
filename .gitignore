@@ -13,6 +13,9 @@
 # Ignore object file
 *.o
 
+# Ignore out file
+*.out
+
 # Ignore zip
 *.tar.gz
 
