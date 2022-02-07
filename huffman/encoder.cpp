@@ -10,7 +10,7 @@ int h_encode( char* input_path, char* output_path )
     FILE* rfp;
     rfp = fopen( input_path, "rb" );
 
-    Node* HT_root;
+    Node* HT_root; // Huffman tree's root
     { // Build huffman tree
         int freqArr[256] = {0};
         getFrequency( rfp, freqArr );
@@ -24,7 +24,7 @@ int h_encode( char* input_path, char* output_path )
         cout << "done getHuffmanTree!\n"; // Debug
     }
 
-    string HT_table[256];
+    string HT_table[256]; // Huffman code table
     { // Build huffman code table
         for ( int i = 0; i < 256; i++ )
             HT_table[i] = "";
@@ -38,10 +38,15 @@ int h_encode( char* input_path, char* output_path )
         }
     }
 
-    FILE* wfp;
+    /* Start Encoding
+     * write data code
+     * write data size    (HEADER)
+     * write huffman tree (HEADER)
+     * */
+    FILE* wfp; 
     wfp = fopen( output_path, "wb" );
     writeHuffmanTree( wfp, HT_root );
-    
+
     fclose( rfp );
     fclose( wfp );
     return 1;
@@ -94,23 +99,26 @@ Node* getHuffmanTree( MinHeap* minHeap )
 }
 void getHuffmanCode( Node* HT_root, string HT_table[], string currCode )
 {
+    // Base case
     if ( HT_root->endFlag == true ){
         int symbol = (unsigned int)(HT_root->symbol);
         HT_table[symbol] = currCode;
         return;
     }
-    getHuffmanCode( HT_root->lChild, HT_table, currCode + "0" );
-    getHuffmanCode( HT_root->rChild, HT_table, currCode + "1" );
+    // DFS
+    getHuffmanCode( HT_root->lChild, HT_table, currCode + "0" ); // left child
+    getHuffmanCode( HT_root->rChild, HT_table, currCode + "1" ); // right child
 }
 void writeHuffmanTree( FILE* wfp, Node* currNode )
 {
+    // Base
     if ( currNode->endFlag == true ) {
         char buffer[32] = {0};
         sprintf( buffer, "%c[%d]", currNode->symbol, currNode->freq );
         fwrite( buffer, sizeof(char)*strlen(buffer), 1, wfp );
         return;
     }
-
+    // Recursive write
     fwrite( "( ", sizeof(char)*strlen("( "), 1, wfp );
     writeHuffmanTree( wfp, currNode->lChild);
     fwrite( ", ", sizeof(char)*strlen(", "), 1, wfp );
