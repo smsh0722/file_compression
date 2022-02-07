@@ -11,7 +11,7 @@ int h_encode( char* input_path, char* output_path )
     rfp = fopen( input_path, "rb" );
 
     Node* HT_root;
-    {
+    { // Build huffman tree
         int freqArr[256] = {0};
         getFrequency( rfp, freqArr );
         cout << "Done freq!\n"; // Debug
@@ -24,10 +24,24 @@ int h_encode( char* input_path, char* output_path )
         cout << "done getHuffmanTree!\n"; // Debug
     }
 
+    string HT_table[256];
+    { // Build huffman code table
+        for ( int i = 0; i < 256; i++ )
+            HT_table[i] = "";
+        getHuffmanCode( HT_root, HT_table, "" );
+
+        for ( int i = 0; i < 256; i++ ){ // Debug
+            if ( HT_table[i].length() > 0 ){
+                cout << char(i) << ": ";
+                cout << HT_table[i] << endl;
+            }
+        }
+    }
+
     FILE* wfp;
     wfp = fopen( output_path, "wb" );
     writeHuffmanTree( wfp, HT_root );
-
+    
     fclose( rfp );
     fclose( wfp );
     return 1;
@@ -41,7 +55,6 @@ void getFrequency( FILE* rfp, int freqArr[] )
         c = fgetc( rfp );
     }
 }
-
 MinHeap* getMinHeap( int freqArr[] )
 {
     MinHeap* minHeap = new MinHeap;
@@ -60,7 +73,6 @@ MinHeap* getMinHeap( int freqArr[] )
     }
     return minHeap;
 }
-
 Node* getHuffmanTree( MinHeap* minHeap )
 {
     Node* root = nullptr;
@@ -80,7 +92,16 @@ Node* getHuffmanTree( MinHeap* minHeap )
     root = minHeap->getMin();
     return root;
 }
-
+void getHuffmanCode( Node* HT_root, string HT_table[], string currCode )
+{
+    if ( HT_root->endFlag == true ){
+        int symbol = (unsigned int)(HT_root->symbol);
+        HT_table[symbol] = currCode;
+        return;
+    }
+    getHuffmanCode( HT_root->lChild, HT_table, currCode + "0" );
+    getHuffmanCode( HT_root->rChild, HT_table, currCode + "1" );
+}
 void writeHuffmanTree( FILE* wfp, Node* currNode )
 {
     if ( currNode->endFlag == true ) {
