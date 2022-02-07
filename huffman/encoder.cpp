@@ -97,17 +97,17 @@ Node* getHuffmanTree( MinHeap* minHeap )
     root = minHeap->getMin();
     return root;
 }
-void getHuffmanCode( Node* HT_root, string HT_table[], string currCode )
+void getHuffmanCode( Node* currNode, string HT_table[], string currCode )
 {
     // Base case
-    if ( HT_root->endFlag == true ){
-        int symbol = (unsigned int)(HT_root->symbol);
+    if ( currNode->endFlag == true ){
+        int symbol = (unsigned int)(currNode->symbol);
         HT_table[symbol] = currCode;
         return;
     }
     // DFS
-    getHuffmanCode( HT_root->lChild, HT_table, currCode + "0" ); // left child
-    getHuffmanCode( HT_root->rChild, HT_table, currCode + "1" ); // right child
+    getHuffmanCode( currNode->lChild, HT_table, currCode + "0" ); // left child
+    getHuffmanCode( currNode->rChild, HT_table, currCode + "1" ); // right child
 }
 void writeHuffmanTree( FILE* wfp, Node* currNode )
 {
