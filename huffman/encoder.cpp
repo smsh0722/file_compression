@@ -101,8 +101,8 @@ void getHuffmanCode( Node* currNode, string HT_table[], string currCode )
 {
     // Base case
     if ( currNode->endFlag == true ){
-        int symbol = (unsigned int)(currNode->symbol);
-        HT_table[symbol] = currCode;
+        int symbolIdx = (unsigned int)(currNode->symbol);
+        HT_table[symbolIdx] = currCode;
         return;
     }
     // DFS
