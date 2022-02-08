@@ -45,8 +45,16 @@ int h_encode( char* input_path, char* output_path )
      * */
     FILE* wfp; 
     wfp = fopen( output_path, "wb" );
-    writeHuffmanTree( wfp, HT_root );
+    {
+        int encodedSize;
+        // Write data code
+        encodedSize = writeData2Code( rfp, wfp, HT_table );
+        cout << "Encoded data size: " << encodedSize << endl; // Debug
+        // Write data size
 
+        // Write huffman tree
+        writeHuffmanTree( wfp, HT_root );
+    }
     fclose( rfp );
     fclose( wfp );
     return 1;
@@ -101,13 +109,49 @@ void getHuffmanCode( Node* currNode, string HT_table[], string currCode )
 {
     // Base case
     if ( currNode->endFlag == true ){
-        int symbol = (unsigned int)(currNode->symbol);
-        HT_table[symbol] = currCode;
+        int symbolIdx = (unsigned int)(currNode->symbol);
+        HT_table[symbolIdx] = currCode;
         return;
     }
     // DFS
     getHuffmanCode( currNode->lChild, HT_table, currCode + "0" ); // left child
     getHuffmanCode( currNode->rChild, HT_table, currCode + "1" ); // right child
+}
+int writeData2Code( FILE* rfp, FILE* wfp, string HT_table[] )
+{
+    char pack = 0;  // bits pack for huffman code
+    char trgSym;    // a symbol of input file
+    int sum = 0;    // bits sum
+    int count = 0;  // packed count(0~8)
+
+    // Reset read file pointer
+    fseek( rfp, 0, SEEK_SET );
+
+    // Pack and write
+    trgSym = fgetc( rfp );
+    while ( trgSym != EOF ){
+        string code = HT_table[(unsigned int)trgSym]; // huffman code for a symbol
+        for ( int i = 0; i < code.length(); i++ ){
+            pack = pack << 1;
+            pack = pack | ( code[i] - '0' );
+            count++;
+            if ( count == 8 ){
+                fwrite( &pack, sizeof(char), 1, wfp );
+                sum += 8;
+                pack = 0;
+                count = 0;
+            }
+        }
+        trgSym = fgetc( rfp );
+    }
+    if ( count != 0 ){
+        fwrite( &pack, sizeof(char), 1, wfp );
+        sum += count;
+        pack = 0;
+        count = 0;
+    }
+
+    return sum;
 }
 void writeHuffmanTree( FILE* wfp, Node* currNode )
 {
