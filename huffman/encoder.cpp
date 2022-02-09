@@ -51,9 +51,11 @@ int h_encode( char* input_path, char* output_path )
     {
         // Write huffman tree
         writeHuffmanTree( wfp, HT_root );
-        
+        writeEndSign( wfp );
+
         // Write data size
         expectedSize = writeDataSize( wfp, freqArr, HT_table );
+        writeEndSign( wfp );
 
         // Write data code
         encodedSize = writeData2Code( rfp, wfp, HT_table );
@@ -163,10 +165,6 @@ int64_t writeData2Code( FILE* rfp, FILE* wfp, string HT_table[] )
 }
 int64_t writeDataSize( FILE* wfp, int freqArr[], string HT_table[] )
 {
-    // Write "END"
-    char HEADER[4] = "END";
-    fwrite( HEADER, sizeof(char), strlen(HEADER), wfp );
-    
     // Calculate encoded size
     int64_t encodedSize = 0;
     for ( int symIdx = 0; symIdx < NUMOFSYMBOL; symIdx++ )
@@ -176,9 +174,6 @@ int64_t writeDataSize( FILE* wfp, int freqArr[], string HT_table[] )
     char encodedSize_string[32] = { 0 };
     sprintf( encodedSize_string, "%ld", encodedSize );
     fwrite( encodedSize_string, sizeof(char), strlen(encodedSize_string), wfp );
-
-    // Write "END"
-    fwrite( HEADER, sizeof(char), strlen(HEADER), wfp );
 
     return encodedSize;
 }
@@ -197,4 +192,10 @@ void writeHuffmanTree( FILE* wfp, Node* currNode )
     fwrite( ", ", sizeof(char)*strlen(", "), 1, wfp );
     writeHuffmanTree( wfp, currNode->rChild);
     fwrite( ") ", sizeof(char)*strlen(") "), 1, wfp );
+}
+void writeEndSign( FILE* wfp )
+{
+    // Write "END"
+    char HEADER[4] = "END";
+    fwrite( HEADER, sizeof(char), strlen(HEADER), wfp );
 }

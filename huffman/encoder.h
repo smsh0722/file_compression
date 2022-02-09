@@ -9,3 +9,4 @@ void getHuffmanCode( Node* currNode, std::string HT_table[], std::string currCod
 int64_t writeData2Code( FILE* rfp, FILE* wfp, std::string HT_table[] );
 int64_t writeDataSize( FILE* wfp, int freqArr[], std::string HT_table[] );
 void writeHuffmanTree( FILE* wfp, Node* currNode );
+void writeEndSign( FILE* wfp );
