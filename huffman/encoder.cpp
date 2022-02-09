@@ -50,10 +50,12 @@ int h_encode( char* input_path, char* output_path )
         // Write data code
         encodedSize = writeData2Code( rfp, wfp, HT_table );
         cout << "Encoded data size: " << encodedSize << endl; // Debug
+        
         // Write data size
+        //writeDataSize( wfp, encodedSize );
 
         // Write huffman tree
-        writeHuffmanTree( wfp, HT_root );
+        //writeHuffmanTree( wfp, HT_root );
     }
     fclose( rfp );
     fclose( wfp );
@@ -152,6 +154,19 @@ int writeData2Code( FILE* rfp, FILE* wfp, string HT_table[] )
     }
 
     return sum;
+}
+void writeDataSize( FILE* wfp, const int encodedSize )
+{
+    fseek( wfp, 0, SEEK_SET );
+    
+    // write size
+    char encodedSize_string[32] = { 0 };
+    sprintf( encodedSize_string, "%d", encodedSize );
+    fwrite( encodedSize_string, sizeof(char), strlen(encodedSize_string), wfp );
+
+    // write END as partition
+    char HEADER[4] = "END";
+    fwrite( HEADER, sizeof(char), strlen(HEADER), wfp );
 }
 void writeHuffmanTree( FILE* wfp, Node* currNode )
 {
