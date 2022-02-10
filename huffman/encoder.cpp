@@ -7,8 +7,6 @@ const int NUMOFSYMBOL = 256;
 
 int h_encode( char* input_path, char* output_path )
 {
-    cout << "start encode\n"; // Debug
-    
     FILE* rfp;
     rfp = fopen( input_path, "rb" );
 
@@ -16,14 +14,11 @@ int h_encode( char* input_path, char* output_path )
     int freqArr[NUMOFSYMBOL] = {0}; // Symbol's freqency
     { // Build huffman tree
         getFrequency( rfp, freqArr );
-        cout << "Done freq!\n"; // Debug
 
         MinHeap* minHeap;
         minHeap = getMinHeap( freqArr );
-        cout << "Done getMinHeap!\n"; // Debug
 
         HT_root = getHuffmanTree( minHeap );
-        cout << "done getHuffmanTree!\n"; // Debug
     }
 
     string HT_table[NUMOFSYMBOL]; // Huffman code table

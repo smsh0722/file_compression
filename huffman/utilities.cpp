@@ -37,14 +37,6 @@ Node* MinHeap::getMin()
     size--;
 
     minHeapify( 0 );
-    
-    {//Deubg
-        if ( rst->endFlag == true )
-            cout << "end";
-        else 
-            cout << rst->symbol;
-        cout << rst->freq << endl;
-    }
 
     return rst;
 }

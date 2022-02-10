@@ -1,3 +1,4 @@
+#pragma once
 struct Node {
     bool endFlag;
     char symbol;

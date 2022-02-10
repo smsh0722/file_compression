@@ -17,15 +17,18 @@ int main( int argc, char* argv[] )
     char* output_path = argv[3];
     
     if ( strcmp( option, "-e" ) == 0 ){ // encode
-        cout << "encode\n"; // Debug
         int result;
-        if ( ( result = h_encode( input_path, output_path ) ) >= 0 ){
-            cout << "result: " << result << endl;
-        }
+        if ( ( result = h_encode( input_path, output_path ) ) >= 0 )
+            cout << "Result size: " << result << endl;
         else 
             cout << "encode error\n";
     }
     else if ( strcmp( option, "-d" ) == 0 ){ // decode
         cout << "decode\n"; // Debug
+        int result;
+        if ( ( result = h_decode( input_path, output_path ) ) >= 0 )
+            cout << "Result size: " << result << endl;
+        else
+            cout << "decode error\n";
     }
 }
