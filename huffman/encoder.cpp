@@ -67,9 +67,9 @@ int h_encode( char* input_path, char* output_path )
 
 void getFrequency( FILE* rfp, int freqArr[] )
 {
-    char c = fgetc( rfp );;
+    int c = fgetc( rfp );;
     while ( c != EOF ){
-        freqArr[(unsigned int)c]++;
+        freqArr[c]++;
         c = fgetc( rfp );
     }
 }
@@ -125,7 +125,7 @@ void getHuffmanCode( Node* currNode, string HT_table[], string currCode )
 int64_t writeData2Code( FILE* rfp, FILE* wfp, string HT_table[] )
 {
     char pack = 0;  // bits pack for huffman code
-    char trgSym;    // a symbol of input file
+    int trgSym;    // a symbol of input file
     int64_t sum = 0;    // bits sum
     int count = 0;  // packed count(0~8)
 
@@ -135,7 +135,7 @@ int64_t writeData2Code( FILE* rfp, FILE* wfp, string HT_table[] )
     // Pack and write
     trgSym = fgetc( rfp );
     while ( trgSym != EOF ){
-        string code = HT_table[(unsigned int)trgSym]; // huffman code for a symbol
+        string code = HT_table[trgSym]; // huffman code for a symbol
         for ( int i = 0; i < code.length(); i++ ){
             pack = pack << 1;
             pack = pack | ( code[i] - '0' );
@@ -182,11 +182,11 @@ void writeHuffmanTree( FILE* wfp, Node* currNode )
         return;
     }
     // Recursive write
-    fwrite( "( ", sizeof(char)*strlen("( "), 1, wfp );
-    writeHuffmanTree( wfp, currNode->lChild);
-    fwrite( ", ", sizeof(char)*strlen(", "), 1, wfp );
-    writeHuffmanTree( wfp, currNode->rChild);
-    fwrite( ") ", sizeof(char)*strlen(") "), 1, wfp );
+    fwrite( "( ", sizeof(char)*strlen("( "), 1, wfp ); // delimiter
+    writeHuffmanTree( wfp, currNode->lChild);        // symbol
+    fwrite( ", ", sizeof(char)*strlen(", "), 1, wfp ); // delimiter
+    writeHuffmanTree( wfp, currNode->rChild);        // symbol
+    fwrite( ") ", sizeof(char)*strlen(") "), 1, wfp ); // delimiter
 }
 void writeEndSign( FILE* wfp )
 {

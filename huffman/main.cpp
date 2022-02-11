@@ -2,6 +2,7 @@
 #include <cstring>
 #include "encoder.h"
 #include "decoder.h"
+
 using namespace std;
 
 int main( int argc, char* argv[] )

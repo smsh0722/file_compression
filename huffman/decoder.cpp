@@ -16,14 +16,15 @@ int h_decode( char* input_path, char* output_path )
     searchEndSign( rfp, endPosArr );
     cout << endPosArr[0] << ", " << endPosArr[1] << endl; // Debug
 
-    return 0;
-
-    Node* HT_root;
+    Node* HT_root = new Node;
+    fseek( rfp, 0, SEEK_SET ); // reset 'read' file pointer
     interpretHuffmanTree( rfp, HT_root );
+
+    return 1; // tmp return val
 }
 void searchEndSign( FILE* rfp, int endPosArr[] )
 {
-    char c;
+    int c;
     int filePos = 0;
     int endPosArr_idx = 0;
     char trg[4] = "END";
@@ -32,7 +33,7 @@ void searchEndSign( FILE* rfp, int endPosArr[] )
         c = fgetc( rfp );
         filePos++;
 
-        if ( trg[trgIdx] == c )
+        if ( trg[trgIdx] == (char)c )
             trgIdx++;
         else
             trgIdx = 0;
@@ -43,8 +44,43 @@ void searchEndSign( FILE* rfp, int endPosArr[] )
         }
     }
 }
-void interpretHuffmanTree( FILE* rfp, Node* HT_root )
-{
-    char previousC, currC;
+int interpretHuffmanTree( FILE* rfp, Node* currNode )
+{   
+    /* non-leaf node must pass three delimiter
+     * leaf node just end with symbol
+     * */
 
+    int previousC, currC;
+    int count = 0; // for non-leaf node
+
+    // start interpret 
+    currC = fgetc( rfp );
+    while ( count <= 2 ){
+        previousC = currC;
+        currC = fgetc( rfp );
+        if ( previousC == '(' && currC == ' '){         // delimiter case 1
+            currNode->endFlag = false;
+            currNode->lChild = new Node;
+            currC = interpretHuffmanTree( rfp, currNode->lChild );
+            count++;
+        }
+        else if ( previousC == ',' && currC == ' ' ){   // delimiter case 2
+            currNode->endFlag = false;
+            currNode->rChild = new Node;
+            currC = interpretHuffmanTree( rfp, currNode->rChild );
+            count++;
+        }
+        else if ( previousC == ')' && currC == ' ' ){   // delimiter case 3
+            currC = fgetc( rfp );
+            count++;
+        }
+        else { // just symbol
+            currNode->endFlag = true;
+            currNode->symbol = previousC;
+            cout << "curr sym: " << currNode->symbol << endl; // Debug
+
+            return currC;
+        }
+    }
+    return currC;
 }
