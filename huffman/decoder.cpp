@@ -16,14 +16,12 @@ int h_decode( char* input_path, char* output_path )
     searchEndSign( rfp, endPosArr );
     cout << endPosArr[0] << ", " << endPosArr[1] << endl; // Debug
 
-    return 0;
-
     Node* HT_root;
-    interpretHuffmanTree( rfp, HT_root );
+    interpretHuffmanTree( rfp, HT_root, endPosArr[0] );
 }
 void searchEndSign( FILE* rfp, int endPosArr[] )
 {
-    char c;
+    int c;
     int filePos = 0;
     int endPosArr_idx = 0;
     char trg[4] = "END";
@@ -32,7 +30,7 @@ void searchEndSign( FILE* rfp, int endPosArr[] )
         c = fgetc( rfp );
         filePos++;
 
-        if ( trg[trgIdx] == c )
+        if ( trg[trgIdx] == (char)c )
             trgIdx++;
         else
             trgIdx = 0;
@@ -43,8 +41,13 @@ void searchEndSign( FILE* rfp, int endPosArr[] )
         }
     }
 }
-void interpretHuffmanTree( FILE* rfp, Node* HT_root )
+void interpretHuffmanTree( FILE* rfp, Node* HT_root, const int endPos )
 {
-    char previousC, currC;
+    fseek( rfp, 0, SEEK_SET );
 
+    int previousC, currC;
+    currC = fgetc( rfp );
+    while( previousC != EOF ){
+
+    }
 }
