@@ -182,11 +182,11 @@ void writeHuffmanTree( FILE* wfp, Node* currNode )
         return;
     }
     // Recursive write
-    fwrite( "( ", sizeof(char)*strlen("( "), 1, wfp );
-    writeHuffmanTree( wfp, currNode->lChild);
-    fwrite( ", ", sizeof(char)*strlen(", "), 1, wfp );
-    writeHuffmanTree( wfp, currNode->rChild);
-    fwrite( ") ", sizeof(char)*strlen(") "), 1, wfp );
+    fwrite( "( ", sizeof(char)*strlen("( "), 1, wfp ); // delimiter
+    writeHuffmanTree( wfp, currNode->lChild);        // symbol
+    fwrite( ", ", sizeof(char)*strlen(", "), 1, wfp ); // delimiter
+    writeHuffmanTree( wfp, currNode->rChild);        // symbol
+    fwrite( ") ", sizeof(char)*strlen(") "), 1, wfp ); // delimiter
 }
 void writeEndSign( FILE* wfp )
 {

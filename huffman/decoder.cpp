@@ -16,8 +16,11 @@ int h_decode( char* input_path, char* output_path )
     searchEndSign( rfp, endPosArr );
     cout << endPosArr[0] << ", " << endPosArr[1] << endl; // Debug
 
-    Node* HT_root;
-    interpretHuffmanTree( rfp, HT_root, endPosArr[0] );
+    Node* HT_root = new Node;
+    fseek( rfp, 0, SEEK_SET ); // reset 'read' file pointer
+    interpretHuffmanTree( rfp, HT_root );
+
+    return 1; // tmp return val
 }
 void searchEndSign( FILE* rfp, int endPosArr[] )
 {
@@ -41,13 +44,43 @@ void searchEndSign( FILE* rfp, int endPosArr[] )
         }
     }
 }
-void interpretHuffmanTree( FILE* rfp, Node* HT_root, const int endPos )
-{
-    fseek( rfp, 0, SEEK_SET );
+int interpretHuffmanTree( FILE* rfp, Node* currNode )
+{   
+    /* non-leaf node must pass three delimiter
+     * leaf node just end with symbol
+     * */
 
     int previousC, currC;
-    currC = fgetc( rfp );
-    while( previousC != EOF ){
+    int count = 0; // for non-leaf node
 
+    // start interpret 
+    currC = fgetc( rfp );
+    while ( count <= 2 ){
+        previousC = currC;
+        currC = fgetc( rfp );
+        if ( previousC == '(' && currC == ' '){         // delimiter case 1
+            currNode->endFlag = false;
+            currNode->lChild = new Node;
+            currC = interpretHuffmanTree( rfp, currNode->lChild );
+            count++;
+        }
+        else if ( previousC == ',' && currC == ' ' ){   // delimiter case 2
+            currNode->endFlag = false;
+            currNode->rChild = new Node;
+            currC = interpretHuffmanTree( rfp, currNode->rChild );
+            count++;
+        }
+        else if ( previousC == ')' && currC == ' ' ){   // delimiter case 3
+            currC = fgetc( rfp );
+            count++;
+        }
+        else { // just symbol
+            currNode->endFlag = true;
+            currNode->symbol = previousC;
+            cout << "curr sym: " << currNode->symbol << endl; // Debug
+
+            return currC;
+        }
     }
+    return currC;
 }
