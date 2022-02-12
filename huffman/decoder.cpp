@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstring>
+#include <string>
+
 #include "decoder.h"
 using namespace std;
 
@@ -16,10 +18,27 @@ int h_decode( char* input_path, char* output_path )
     searchEndSign( rfp, endPosArr );
     cout << endPosArr[0] << ", " << endPosArr[1] << endl; // Debug
 
+    // Interpret huffman tree
     Node* HT_root = new Node;
     fseek( rfp, 0, SEEK_SET ); // reset 'read' file pointer
     interpretHuffmanTree( rfp, HT_root );
+    
+    // Check error
+    if ( ftell( rfp ) - 1 != endPosArr[0] )
+        return -1;
+    
+    // Get data size
+    const int64_t DATA_SIZE = getDataSize( rfp, endPosArr );
 
+    // Decode data
+    FILE* wfp;
+    wfp = fopen( output_path, "wb" );
+    fseek( rfp, endPosArr[1] + 3, SEEK_SET );
+    decodeData( rfp, wfp, HT_root, DATA_SIZE );
+
+    // End function
+    fclose( rfp );
+    fclose( wfp );
     return 1; // tmp return val
 }
 void searchEndSign( FILE* rfp, int endPosArr[] )
@@ -83,4 +102,51 @@ int interpretHuffmanTree( FILE* rfp, Node* currNode )
         }
     }
     return currC;
+}
+int64_t getDataSize( FILE* rfp, int endPosArr[] )
+{
+    fseek( rfp, endPosArr[0] + 3, SEEK_SET );
+
+    string dataSize_str = "";
+    int remainingCount = endPosArr[1] - endPosArr[0] - 3;
+    while ( remainingCount > 0 ){
+        dataSize_str += fgetc( rfp );
+        remainingCount--;
+    }
+
+    return stol( dataSize_str, nullptr, 10 );
+}
+void decodeData( FILE* rfp, FILE* wfp, Node* HT_root, const int64_t DATA_SIZE )
+{
+    Node* currNode = HT_root;
+    int64_t bitCount = 0;
+    int packCount = 0;
+    char pack;
+    char mask = 1 << 7; // 1000 0000
+    bool rightFlag;
+    char symbol = 0;
+    string debug = "";
+    while ( bitCount < DATA_SIZE ){
+        pack = fgetc( rfp );
+        packCount = 0;
+        while ( bitCount < DATA_SIZE && packCount < 8 ){
+            rightFlag = (pack & mask) != 0;
+            pack = pack << 1;
+            packCount++;
+            bitCount++;
+
+            currNode = rightFlag ? currNode->rChild : currNode->lChild;
+            debug += rightFlag ? "1" : "0";
+            if ( currNode->endFlag == true ){
+                symbol = currNode->symbol;
+                fwrite( &symbol, sizeof(char), 1, wfp );
+                { // Debug
+                    cout << symbol << ": " << debug << endl;
+                    debug = "";
+                }
+                symbol = 0;
+                currNode = HT_root;
+            }
+        }
+    }
 }
