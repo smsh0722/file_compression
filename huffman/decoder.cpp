@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstring>
+#include <string>
+
 #include "decoder.h"
 using namespace std;
 
@@ -16,9 +18,19 @@ int h_decode( char* input_path, char* output_path )
     searchEndSign( rfp, endPosArr );
     cout << endPosArr[0] << ", " << endPosArr[1] << endl; // Debug
 
+    // Interpret huffman tree
     Node* HT_root = new Node;
     fseek( rfp, 0, SEEK_SET ); // reset 'read' file pointer
     interpretHuffmanTree( rfp, HT_root );
+    
+    // Check error
+    if ( ftell( rfp ) - 1 != endPosArr[0] )
+        return -1;
+    
+    // Get data size
+    const int64_t DATA_SIZE = getDataSize( rfp, endPosArr );
+
+    // Decode data
 
     return 1; // tmp return val
 }
@@ -83,4 +95,17 @@ int interpretHuffmanTree( FILE* rfp, Node* currNode )
         }
     }
     return currC;
+}
+int64_t getDataSize( FILE* rfp, int endPosArr[] )
+{
+    fseek( rfp, endPosArr[0] + 3, SEEK_SET );
+
+    string dataSize_str = "";
+    int remainingCount = endPosArr[1] - endPosArr[0] - 3;
+    while ( remainingCount > 0 ){
+        dataSize_str += fgetc( rfp );
+        remainingCount--;
+    }
+
+    return stol( dataSize_str, nullptr, 10 );
 }
