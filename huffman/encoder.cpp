@@ -150,6 +150,7 @@ int64_t writeData2Code( FILE* rfp, FILE* wfp, string HT_table[] )
         trgSym = fgetc( rfp );
     }
     if ( count != 0 ){
+        pack = pack << ( 8 - count ); // shift bits to left
         fwrite( &pack, sizeof(char), 1, wfp );
         sum += count;
         pack = 0;
